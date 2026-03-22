@@ -1,0 +1,32 @@
+{
+  "name": "mqtt-rgb-matrix",
+  "version": "0.1.1",
+  "description": "Control your RGB matrix using MQTT.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "author": {
+    "email": "mail@maxswart.nl",
+    "name": "Max Swart",
+    "url": "https://maxswart.nl"
+  },
+  "main": "./src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "sudo node --env-file=.env dist/index.js",
+    "docker-start": "node --env-file=.env dist/index.js",
+    "dev": "sudo ./node_modules/.bin/tsx watch --env-file=.env src/index.ts",
+    "push": "./push.sh"
+  },
+  "dependencies": {
+    "gif-frames": "^1.0.1",
+    "mqtt": "^5.15.0",
+    "pngjs": "^7.0.0",
+    "rpi-led-matrix": "^1.15.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "@types/pngjs": "^6.0.5",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}
