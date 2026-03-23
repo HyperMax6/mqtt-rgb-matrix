@@ -11,3 +11,5 @@ push.sh
 assets/animations
 
 *.db
+
+AGENTS.md
