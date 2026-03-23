@@ -20,8 +20,8 @@ A TypeScript application for Raspberry Pi that turns an RGB LED matrix panel int
 ### Hardware
 - Raspberry Pi (any model with GPIO pins)
 - RGB LED Matrix Panel (64x64 or configurable size)
-- Proper wiring/hat for connecting the panel to the Pi
-- Optional: Power supply for the LED panel
+- Power supply for the LED panel
+- Optional: Proper wiring/hat for connecting the panel to the Pi
 
 ### Software
 - Node.js 18+ or 20+
@@ -37,25 +37,28 @@ git clone <repository-url>
 cd mqtt-rgb-matrix
 ```
 
-2. Install dependencies:
+2. Install dependencies (can take a while):
 ```bash
-pnpm install
-```
+npm install
+``` 
 
 3. Build the TypeScript:
 ```bash
-pnpm run build
+npm run build
 ```
 
-4. Configure environment variables (see Configuration section)
+4. Configure environment variables (see Configuration section):
+```bash
+nano .env
+```
 
 5. Run the application:
 ```bash
 # Production
-pnpm start
+npm run start
 
 # Development (with hot reload)
-pnpm run dev
+npm run dev
 ```
 
 ## Configuration
@@ -87,39 +90,33 @@ MATRIX_HEIGHT=64                         # Panel height in pixels (default: 64)
 
 The application listens for control messages on the following MQTT topics:
 
-- **`rgb-matrix/mode`** - Set the display mode
-  - Payload: One of the mode names (see Available Modes)
+- **`matrix/control`** - Turn the display on and off
+  - Payload: `ON` or `OFF`
   
-- **`rgb-matrix/text`** - Display custom text (for the Text mode)
-  - Payload: Text string to display
+- **`matrix/control/brightness`** - 
+  - Payload: number between `0` and `100`
 
-### Example MQTT Commands
+- **`matrix/control/app`** -
+  - Payload: one of the app names
 
-Using `mosquitto_pub`:
-```bash
-# Switch to clock mode
-mosquitto_pub -h 192.168.1.3 -t "rgb-matrix/mode" -m "Digital Clock"
+> The MQTT infrastructure is tailor-made for [Home Assistant](https://www.home-assistant.io/), but should be adaptable to any workflow. 
 
-# Switch to LGBTQ flag
-mosquitto_pub -h 192.168.1.3 -t "rgb-matrix/mode" -m "LGBTQ"
+## Default Apps
 
-# Display custom text
-mosquitto_pub -h 192.168.1.3 -t "rgb-matrix/text" -m "Hello World!"
-mosquitto_pub -h 192.168.1.3 -t "rgb-matrix/mode" -m "Connected"
+| App | Description |
+|------|-------------|
+| `LGBTQ` | Rainbow pride flag |
+| `Digital Clock` | Current time in large font |
+| `LGBTQ Clock` | Pride flag background with clock |
+| `Connected` | Shows "Connected!" message |
+| `Demon Days` | Displays demon-days.png image |
 
-# Display an image
-mosquitto_pub -h 192.168.1.3 -t "rgb-matrix/mode" -m "Demon Days"
-```
+## Creating Apps
 
-## Available Modes
+> There are future plans to switch to a SQLite approach for user-friendly configuration.
 
-| Mode | Description | FPS |
-|------|-------------|-----|
-| `LGBTQ` | Animated rainbow pride flag | Default |
-| `Digital Clock` | Current time with large font | 4 |
-| `LGBTQ Clock` | Pride flag background with clock | 4 |
-| `Connected` | Shows "Connected!" message | Default |
-| `Demon Days` | Displays demon-days.png image | 4 |
+Every app is made up of app functions. You can create your own app functions inside the `src/apps/` directory.
+Defining apps is done in `src/apps/apps.ts`. See more about developing apps in the [development](#development) section.
 
 ## Assets
 
@@ -158,20 +155,19 @@ Images should be sized to match your panel dimensions (default 64x64).
 └── package.json
 ```
 
-## Development
+# Development
 
-### Scripts
+## Scripts
 
-- `pnpm run build` - Compile TypeScript
-- `pnpm start` - Run compiled code (requires sudo for GPIO access)
-- `pnpm run dev` - Development mode with hot reload
-- `pnpm run push` - Push script for deployment
+- `npm run build` - Compile TypeScript
+- `npm start` - Run compiled code (requires sudo for GPIO access)
+- `npm run dev` - Development mode with hot reload
 
-### Adding New Modes
+## Adding New Apps
 
-1. Create a new file in `src/apps/` (e.g., `my-mode.ts`)
+1. Create a new file in `src/apps/` (e.g., `my-app.ts`)
 2. Export an async function that takes `(matrix, options)`
-3. Register the mode in `src/apps/apps.ts`
+3. Register the app in `src/apps/apps.ts`
 4. Define options type in `AppFunctionOptions` if needed
 
 Example:
@@ -179,15 +175,15 @@ Example:
 import type { LedMatrixInstance } from 'rpi-led-matrix';
 import type { AppFunctionOptions } from './apps.js';
 
-async function myMode(matrix: LedMatrixInstance, options?: AppFunctionOptions) {
+async function myApp(matrix: LedMatrixInstance, options?: AppFunctionOptions) {
   // Your drawing code here
-  matrix.fgColor({ r: 255, g: 0, b: 0 }).setPixel(0, 0);
+  matrix.fgColor({ r: 255, g: 0, b: 0 }).fill();
 }
 
 export default myMode;
 ```
 
-## Troubleshooting
+# Troubleshooting
 
 ### Permission Denied
 The application requires root access to control GPIO pins. Use `sudo` or run as root.
