@@ -2,6 +2,7 @@ import type { Color, LedMatrixInstance } from 'rpi-led-matrix';
 import lgbtq from './lgbtq.js';
 import digitalClock from './digital-clock.js';
 import text from './text.js';
+import png from './png.js';
 
 export type AppFunction = (
   matrix: LedMatrixInstance,
@@ -13,6 +14,7 @@ export type AppFunctionOptions = {
   position?: 'centered' | 'top' | 'bottom';
   font?: string;
   text?: string;
+  path?: string;
 };
 
 export type App = {
@@ -58,6 +60,21 @@ const apps: Record<string, App> = {
         options: { font: '6x9.bdf', text: 'Connected!', position: 'centered' },
       },
     ],
+  },
+  'Demon Days': {
+    displayName: 'Demon Days',
+    functions: [{ function: png, options: { path: 'demon-days.png' } }],
+    fps: 4,
+  },
+  'Monet Garden': {
+    displayName: 'Monet Garden',
+    functions: [
+      {
+        function: png,
+        options: { path: 'monet-garden.png' },
+      },
+    ],
+    fps: 4,
   },
 };
 

@@ -9,4 +9,5 @@ pnpm-workspace.yaml
 push.sh
 
 assets/animations
-assets/pictures
+
+*.db
